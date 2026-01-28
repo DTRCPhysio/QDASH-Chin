@@ -2,240 +2,304 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
-  <title>上肢功能受損程度問卷（Chinese QuickDASH）</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
+  <title>QuickDASH（中文版）</title>
   <style>
     body {
-      font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
-      background: #f5f5f5;
-      margin: 0;
-      padding: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", sans-serif;
+      margin: 20px;
+      line-height: 1.6;
     }
-
-    .container {
-      max-width: 900px;
-      margin: auto;
-      background: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-
-    h1 {
+    h1, h2 {
       text-align: center;
-      margin-bottom: 20px;
     }
-
-    .question {
-      margin-bottom: 20px;
-      padding: 12px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      background: #fafafa;
-    }
-
-    .question-title {
-      font-weight: bold;
-      margin-bottom: 8px;
-    }
-
-    .options {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .option {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 10px;
-      border-radius: 6px;
-      background: #fff;
+    fieldset {
       border: 1px solid #ccc;
-      cursor: pointer;
-      font-size: 0.9rem;
+      padding: 15px 20px;
+      margin-bottom: 20px;
     }
-
-    .option input {
-      cursor: pointer;
+    legend {
+      font-weight: bold;
+      padding: 0 5px;
     }
-
-    button {
+    .item {
+      margin-bottom: 12px;
+    }
+    .item-title {
+      margin-bottom: 4px;
+      font-weight: bold;
+    }
+    .options label {
+      margin-right: 15px;
+      white-space: nowrap;
+    }
+    .btn-row {
+      text-align: center;
       margin-top: 20px;
-      padding: 12px 20px;
-      border: none;
-      border-radius: 6px;
-      background: #1976d2;
-      color: white;
-      font-size: 1rem;
+    }
+    button {
+      padding: 8px 18px;
+      font-size: 15px;
       cursor: pointer;
     }
-
-    button:hover {
-      background: #125a9c;
-    }
-
-    .modal {
-      display: none;
+    /* 簡單彈出視窗樣式 */
+    #popup-overlay {
       position: fixed;
-      z-index: 1000;
       inset: 0;
       background: rgba(0,0,0,0.4);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
     }
-
-    .modal-content {
+    #popup-box {
       background: #fff;
-      margin: 15% auto;
-      padding: 20px;
-      border-radius: 10px;
-      width: 90%;
-      max-width: 400px;
-      text-align: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-    }
-
-    .close-btn {
-      margin-top: 15px;
-      padding: 10px 16px;
-      background: #555;
-      color: white;
-      border: none;
+      padding: 20px 24px;
       border-radius: 6px;
+      max-width: 360px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    }
+    #popup-box h3 {
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+    #popup-message {
+      margin-bottom: 16px;
+      white-space: pre-line;
+    }
+    #popup-close {
+      display: inline-block;
+      padding: 6px 14px;
+      background: #007aff;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
       cursor: pointer;
-    }
-
-    .close-btn:hover {
-      background: #333;
-    }
-
-    .warning {
-      color: #c62828;
-      margin-top: 10px;
-      font-size: 0.9rem;
-    }
-
-    @media (max-width: 600px) {
-      .options {
-        flex-direction: column;
-      }
-      .option {
-        width: 100%;
-      }
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
 
-<div class="container">
-  <h1>上肢功能受損程度問卷（Chinese QuickDASH）</h1>
-  <p>請根據你過去一星期的情況，選擇最符合你能力或症狀的分數。</p>
+<h1>上肢功能評定（中文簡短版）</h1>
 
-  <div id="questions"></div>
+<p>
+  請根據你在<strong>過去一星期</strong>的情況作答。<br>
+  若你在過去一星期沒有進行某項活動，請估計若要進行該活動時的困難程度，並選擇最合適的答案。<br>
+  無論你使用左手或右手，請按你實際的能力作出評估。
+</p>
 
-  <button onclick="calculateQDASH()">計算分數</button>
-  <div id="warning" class="warning"></div>
-</div>
+<form id="qdash-form">
+  <fieldset>
+    <legend>日常活動能力</legend>
 
-<!-- Modal -->
-<div id="scoreModal" class="modal">
-  <div class="modal-content">
-    <h2>QuickDASH 結果</h2>
-    <p id="rawScoreText"></p>
-    <p id="finalScoreText"></p>
-    <p style="font-size:0.9rem; color:#555;">
-      QuickDASH 分數範圍：0（最佳功能）至 100（最差功能）
-    </p>
-    <button class="close-btn" onclick="closeModal()">關閉</button>
+    <div class="item">
+      <div class="item-title">1. 開啟緊或新樽蓋：</div>
+      <div class="options">
+        <label><input type="radio" name="q1" value="1"> 沒困難</label>
+        <label><input type="radio" name="q1" value="2"> 輕微困難</label>
+        <label><input type="radio" name="q1" value="3"> 中度困難</label>
+        <label><input type="radio" name="q1" value="4"> 很大困難</label>
+        <label><input type="radio" name="q1" value="5"> 做不到</label>
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="item-title">2. 做粗重家務（如：洗地、抹窗）：</div>
+      <div class="options">
+        <label><input type="radio" name="q2" value="1"> 沒困難</label>
+        <label><input type="radio" name="q2" value="2"> 輕微困難</label>
+        <label><input type="radio" name="q2" value="3"> 中度困難</label>
+        <label><input type="radio" name="q2" value="4"> 很大困難</label>
+        <label><input type="radio" name="q2" value="5"> 做不到</label>
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="item-title">3. 拿購物袋或公事包：</div>
+      <div class="options">
+        <label><input type="radio" name="q3" value="1"> 沒困難</label>
+        <label><input type="radio" name="q3" value="2"> 輕微困難</label>
+        <label><input type="radio" name="q3" value="3"> 中度困難</label>
+        <label><input type="radio" name="q3" value="4"> 很大困難</label>
+        <label><input type="radio" name="q3" value="5"> 做不到</label>
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="item-title">4. 清潔背部：</div>
+      <div class="options">
+        <label><input type="radio" name="q4" value="1"> 沒困難</label>
+        <label><input type="radio" name="q4" value="2"> 輕微困難</label>
+        <label><input type="radio" name="q4" value="3"> 中度困難</label>
+        <label><input type="radio" name="q4" value="4"> 很大困難</label>
+        <label><input type="radio" name="q4" value="5"> 做不到</label>
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="item-title">5. 用刀切食物：</div>
+      <div class="options">
+        <label><input type="radio" name="q5" value="1"> 沒困難</label>
+        <label><input type="radio" name="q5" value="2"> 輕微困難</label>
+        <label><input type="radio" name="q5" value="3"> 中度困難</label>
+        <label><input type="radio" name="q5" value="4"> 很大困難</label>
+        <label><input type="radio" name="q5" value="5"> 做不到</label>
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="item-title">
+        6. 手臂、肩膀及手部需要用力的康樂活動（如：打高爾夫球、使用鎚子、打網球等）：
+      </div>
+      <div class="options">
+        <label><input type="radio" name="q6" value="1"> 沒困難</label>
+        <label><input type="radio" name="q6" value="2"> 輕微困難</label>
+        <label><input type="radio" name="q6" value="3"> 中度困難</label>
+        <label><input type="radio" name="q6" value="4"> 很大困難</label>
+        <label><input type="radio" name="q6" value="5"> 做不到</label>
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>社交及工作／日常活動</legend>
+
+    <div class="item">
+      <div class="item-title">
+        7. 在過去的一星期，你的手臂、肩膀或手部疾患有否影響你與家人、朋友、鄰居或其他團體的正常社交活動？
+      </div>
+      <div class="options">
+        <label><input type="radio" name="q7" value="1"> 完全沒影響</label>
+        <label><input type="radio" name="q7" value="2"> 輕微影響</label>
+        <label><input type="radio" name="q7" value="3"> 中度影響</label>
+        <label><input type="radio" name="q7" value="4"> 頗有影響</label>
+        <label><input type="radio" name="q7" value="5"> 嚴重影響</label>
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="item-title">
+        8. 在過去的一星期，你的手臂、肩膀或手部疾患有否限制了你的工作或其他日常起居活動？
+      </div>
+      <div class="options">
+        <label><input type="radio" name="q8" value="1"> 完全沒限制</label>
+        <label><input type="radio" name="q8" value="2"> 輕微限制</label>
+        <label><input type="radio" name="q8" value="3"> 中度限制</label>
+        <label><input type="radio" name="q8" value="4"> 頗大限制</label>
+        <label><input type="radio" name="q8" value="5"> 做不到</label>
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>症狀嚴重程度（過去一星期）</legend>
+
+    <p>請在下列 9–11 項選擇適當的選項，以顯示不同病徵在上星期的嚴重程度。</p>
+
+    <div class="item">
+      <div class="item-title">9. 手臂、肩膀或手部痛楚：</div>
+      <div class="options">
+        <label><input type="radio" name="q9" value="1"> 無</label>
+        <label><input type="radio" name="q9" value="2"> 輕微</label>
+        <label><input type="radio" name="q9" value="3"> 中度</label>
+        <label><input type="radio" name="q9" value="4"> 嚴重</label>
+        <label><input type="radio" name="q9" value="5"> 極為嚴重</label>
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="item-title">10. 手臂、肩膀或手部感到針刺：</div>
+      <div class="options">
+        <label><input type="radio" name="q10" value="1"> 無</label>
+        <label><input type="radio" name="q10" value="2"> 輕微</label>
+        <label><input type="radio" name="q10" value="3"> 中度</label>
+        <label><input type="radio" name="q10" value="4"> 嚴重</label>
+        <label><input type="radio" name="q10" value="5"> 極為嚴重</label>
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="item-title">
+        11. 在過去的一星期，你有否因為手臂、肩膀或手部痛楚而影響睡眠：
+      </div>
+      <div class="options">
+        <label><input type="radio" name="q11" value="1"> 沒影響</label>
+        <label><input type="radio" name="q11" value="2"> 輕微影響</label>
+        <label><input type="radio" name="q11" value="3"> 中度影響</label>
+        <label><input type="radio" name="q11" value="4"> 很大影響</label>
+        <label><input type="radio" name="q11" value="5"> 極大影響至不能入睡</label>
+      </div>
+    </div>
+  </fieldset>
+
+  <div class="btn-row">
+    <button type="button" onclick="calculateScore()">計算分數</button>
+    <button type="reset">清除重填</button>
+  </div>
+</form>
+
+<!-- 彈出視窗 -->
+<div id="popup-overlay">
+  <div id="popup-box">
+    <h3 id="popup-title">提示</h3>
+    <div id="popup-message"></div>
+    <button id="popup-close" onclick="closePopup()">關閉</button>
   </div>
 </div>
 
 <script>
-const questions = [
-  "1. 扭開緊或新的瓶蓋",
-  "2. 做消耗大量體力的家務（例如：抹窗或洗擦地板）",
-  "3. 攜帶購物袋或公事包",
-  "4. 清洗背部",
-  "5. 用刀切食物",
-  "6. 進行需要上肢發力或承受衝力的餘閒活動（如高爾夫、排球、網球等）",
-  "7. 因肩膊、手臂或手部問題影響社交活動的程度",
-  "8. 因肩膊、手臂或手部問題影響工作或日常活動的程度",
-  "9. 肩膊、手臂或手部的痛楚程度",
-  "10. 肩膊、手臂或手部的針刺感覺程度",
-  "11. 因肩膊、手臂或手部痛楚引致睡眠困難的程度"
-];
+  const questionNames = [
+    "q1","q2","q3","q4","q5","q6",
+    "q7","q8","q9","q10","q11"
+  ];
 
-const labels = [
-  "1 – 沒有困難 / 沒有症狀",
-  "2 – 少許困難 / 輕微",
-  "3 – 中度困難 / 中度",
-  "4 – 非常困難 / 嚴重",
-  "5 – 不能做到 / 極度"
-];
-
-const questionsDiv = document.getElementById("questions");
-
-questions.forEach((q, index) => {
-  const qNum = index + 1;
-  const qDiv = document.createElement("div");
-  qDiv.className = "question";
-
-  const title = document.createElement("div");
-  title.className = "question-title";
-  title.textContent = q;
-  qDiv.appendChild(title);
-
-  const optionsDiv = document.createElement("div");
-  optionsDiv.className = "options";
-
-  for (let i = 1; i <= 5; i++) {
-    const label = document.createElement("label");
-    label.className = "option";
-
-    const input = document.createElement("input");
-    input.type = "radio";
-    input.name = `q${qNum}`;
-    input.value = i;
-
-    label.appendChild(input);
-    label.appendChild(document.createTextNode(labels[i - 1]));
-    optionsDiv.appendChild(label);
+  function openPopup(title, message) {
+    document.getElementById('popup-title').textContent = title;
+    document.getElementById('popup-message').textContent = message;
+    document.getElementById('popup-overlay').style.display = 'flex';
   }
 
-  qDiv.appendChild(optionsDiv);
-  questionsDiv.appendChild(qDiv);
-});
+  function closePopup() {
+    document.getElementById('popup-overlay').style.display = 'none';
+  }
 
-function calculateQDASH() {
-  const warning = document.getElementById("warning");
-  warning.textContent = "";
+  function calculateScore() {
+    const form = document.getElementById('qdash-form');
+    let missing = [];
+    let sum = 0;
+    let answeredCount = 0;
 
-  let total = 0;
-  let count = 0;
+    questionNames.forEach((qName, index) => {
+      const checked = form.querySelector('input[name="' + qName + '"]:checked');
+      if (!checked) {
+        // 顯示題號（1–11）
+        missing.push(index + 1);
+      } else {
+        sum += parseInt(checked.value, 10);
+        answeredCount++;
+      }
+    });
 
-  for (let i = 1; i <= 11; i++) {
-    const selected = document.querySelector(`input[name="q${i}"]:checked`);
-    if (!selected) {
-      warning.textContent = "請完成所有題目後再計算分數。";
+    if (missing.length > 0) {
+      const msg =
+        "你仍有題目未作答：\n\n" +
+        "第 " + missing.join("、") + " 題。\n\n" +
+        "請完成所有題目後再按「計算分數」。";
+      openPopup("有題目未完成", msg);
       return;
     }
-    total += parseInt(selected.value);
-    count++;
+
+    // QuickDASH 標準計分公式：((總分 / 已回答題數) - 1) × 25
+    const mean = sum / answeredCount;
+    const score = ((mean - 1) * 25).toFixed(1);
+
+    const resultMsg =
+      "你的 QuickDASH 分數為： " + score + " 分（0–100）。\n\n" +
+      "分數愈高，代表上肢功能障礙及症狀愈嚴重。\n" +
+      "請將此結果交予醫護人員作臨床評估參考。";
+
+    openPopup("QuickDASH 分數", resultMsg);
   }
-
-  // QuickDASH formula: ((sum/n) - 1) × 25
-  const mean = total / count;
-  const finalScore = ((mean - 1) * 25).toFixed(1);
-
-  document.getElementById("rawScoreText").innerHTML = `原始分數總和：<strong>${total}</strong>`;
-  document.getElementById("finalScoreText").innerHTML = `QuickDASH 最終分數：<strong>${finalScore}</strong>`;
-  document.getElementById("scoreModal").style.display = "block";
-}
-
-function closeModal() {
-  document.getElementById("scoreModal").style.display = "none";
-}
 </script>
 
 </body>
